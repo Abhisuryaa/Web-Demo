@@ -79,7 +79,6 @@ techvritti/
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
 "# Web-Demo" 
 "# Web-Demo" 
 "# Web-Demo" 
