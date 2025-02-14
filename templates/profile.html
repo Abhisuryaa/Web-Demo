@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Student Profile</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        <!-- Personal Information -->
+                        <h5 class="card-title mb-4">Personal Information</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="full_name" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="full_name" name="full_name" 
+                                       value="{{ current_user.full_name }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" value="{{ current_user.email }}" readonly>
+                            </div>
+                        </div>
+
+                        <!-- Education -->
+                        <h5 class="card-title mb-4 mt-4">Education</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="qualification" class="form-label">Qualification</label>
+                                <input type="text" class="form-control" id="qualification" name="qualification"
+                                       value="{{ current_user.qualification }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="graduation_year" class="form-label">Graduation Year</label>
+                                <input type="number" class="form-control" id="graduation_year" name="graduation_year"
+                                       value="{{ current_user.graduation_year }}" required>
+                            </div>
+                        </div>
+
+                        <!-- Skills -->
+                        <h5 class="card-title mb-4 mt-4">Skills & Experience</h5>
+                        <div class="mb-3">
+                            <label for="skills" class="form-label">Technical Skills</label>
+                            <textarea class="form-control" id="skills" name="skills" rows="3" required>{{ current_user.skills }}</textarea>
+                            <div class="form-text">List your technical skills (e.g., Programming languages, frameworks)</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="certifications" class="form-label">Certifications</label>
+                            <textarea class="form-control" id="certifications" name="certifications" rows="3">{{ current_user.certifications }}</textarea>
+                            <div class="form-text">List any relevant certifications or courses</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="experience" class="form-label">Work Experience</label>
+                            <textarea class="form-control" id="experience" name="experience" rows="4">{{ current_user.experience }}</textarea>
+                            <div class="form-text">Describe your work experience</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="known_software" class="form-label">Software Knowledge</label>
+                            <input type="text" class="form-control" id="known_software" name="known_software"
+                                   value="{{ current_user.known_software }}">
+                            <div class="form-text">List software applications you're familiar with</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="soft_skills" class="form-label">Soft Skills</label>
+                            <input type="text" class="form-control" id="soft_skills" name="soft_skills"
+                                   value="{{ current_user.soft_skills }}">
+                            <div class="form-text">List your soft skills (e.g., Communication, Leadership)</div>
+                        </div>
+
+                        <!-- Resume Upload -->
+                        <div class="mb-4">
+                            <label for="resume" class="form-label">Resume (PDF format)</label>
+                            <input type="file" class="form-control" id="resume" name="resume" accept=".pdf">
+                            {% if current_user.resume_path %}
+                            <div class="form-text">Current resume: {{ current_user.resume_path }}</div>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Save Profile</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Section -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Skills Assessment</h5>
+                    {% if current_user.quiz_score %}
+                    <div class="text-center mb-4">
+                        <div class="display-4">{{ current_user.quiz_score }}%</div>
+                        <p class="text-muted">Your quiz score</p>
+                    </div>
+                    <a href="{{ url_for('quiz') }}" class="btn btn-outline-primary d-block">Retake Quiz</a>
+                    {% else %}
+                    <p class="card-text">You haven't taken the skills assessment quiz yet.</p>
+                    <a href="{{ url_for('quiz') }}" class="btn btn-primary d-block">Take Quiz</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+{% endblock %}

@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Admin Dashboard</h1>
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Students</h5>
+                    <h2 class="card-text">{{ total_students }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Quizzes Completed</h5>
+                    <h2 class="card-text">{{ total_quizzes }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Average Score</h5>
+                    <h2 class="card-text">{{ avg_score }}%</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student List -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Student Information</h5>
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-primary" onclick="exportToCSV()">
+                    <i class="fas fa-download"></i> Export
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Qualification</th>
+                            <th>Skills</th>
+                            <th>Quiz Score</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr>
+                            <td>{{ student.full_name }}</td>
+                            <td>{{ student.email }}</td>
+                            <td>{{ student.qualification }}</td>
+                            <td>{{ student.skills }}</td>
+                            <td>{{ student.quiz_score if student.quiz_score else 'Not taken' }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" onclick="viewDetails('{{ student.id }}')">
+                                    View Details
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Student Details Modal -->
+<div class="modal fade" id="studentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Student Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="studentDetails">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function viewDetails(studentId) {
+    fetch(`/student/${studentId}`)
+        .then(response => response.json())
+        .then(data => {
+            const details = document.getElementById('studentDetails');
+            details.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Personal Information</h6>
+                        <p><strong>Name:</strong> ${data.full_name}</p>
+                        <p><strong>Email:</strong> ${data.email}</p>
+                        <p><strong>Qualification:</strong> ${data.qualification}</p>
+                        <p><strong>Graduation Year:</strong> ${data.graduation_year}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Skills & Experience</h6>
+                        <p><strong>Skills:</strong> ${data.skills}</p>
+                        <p><strong>Certifications:</strong> ${data.certifications}</p>
+                        <p><strong>Experience:</strong> ${data.experience}</p>
+                        <p><strong>Software Knowledge:</strong> ${data.known_software}</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6>Quiz Performance</h6>
+                        <p><strong>Score:</strong> ${data.quiz_score ? data.quiz_score + '%' : 'Not taken'}</p>
+                    </div>
+                </div>
+            `;
+            new bootstrap.Modal(document.getElementById('studentModal')).show();
+        });
+}
+
+function exportToCSV() {
+    window.location.href = '/export-students';
+}
+</script>
+{% endblock %}

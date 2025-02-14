@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Skills Assessment Quiz{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Skills Assessment Quiz</h2>
+                    
+                    <!-- Quiz Instructions -->
+                    <div class="alert alert-info mb-4" id="quiz-instructions">
+                        <h5 class="alert-heading">Instructions:</h5>
+                        <ul class="mb-0">
+                            <li>This quiz will assess your technical knowledge and skills.</li>
+                            <li>Each question has multiple choice options.</li>
+                            <li>Select the best answer for each question.</li>
+                            <li>You cannot go back to previous questions.</li>
+                            <li>Your final score will be displayed at the end.</li>
+                        </ul>
+                        <button class="btn btn-primary mt-3" onclick="startQuiz()">Start Quiz</button>
+                    </div>
+
+                    <!-- Quiz Container -->
+                    <div id="quiz-container" style="display: none;">
+                        <div class="progress mb-4">
+                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+
+                        <div id="question-container">
+                            <!-- Questions will be loaded here -->
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button class="btn btn-primary" onclick="submitAnswer()">Next Question</button>
+                            <span class="align-self-center" id="question-counter"></span>
+                        </div>
+                    </div>
+
+                    <!-- Results Container -->
+                    <div id="results-container" style="display: none;">
+                        <div class="text-center">
+                            <h3 class="mb-4">Quiz Completed!</h3>
+                            <div class="display-4 mb-4" id="final-score"></div>
+                            <p class="lead mb-4" id="score-message"></p>
+                            <div class="d-grid gap-2">
+                                <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Return to Dashboard</a>
+                                <button class="btn btn-outline-primary" onclick="retakeQuiz()">Take Quiz Again</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const questions = [
+    {
+        text: "Which of the following is NOT a valid way to declare a variable in JavaScript?",
+        options: [
+            "let x = 5;",
+            "const y = 10;",
+            "variable z = 15;",
+            "var w = 20;"
+        ],
+        correct: 2
+    },
+    {
+        text: "What is the primary purpose of SQL?",
+        options: [
+            "To style web pages",
+            "To manage and query databases",
+            "To create server-side applications",
+            "To handle client-side validation"
+        ],
+        correct: 1
+    },
+    {
+        text: "Which data structure follows the LIFO (Last In, First Out) principle?",
+        options: [
+            "Queue",
+            "Stack",
+            "Array",
+            "Linked List"
+        ],
+        correct: 1
+    },
+    // Add more questions as needed
+];
+
+let currentQuestion = 0;
+let score = 0;
+
+function startQuiz() {
+    document.getElementById('quiz-instructions').style.display = 'none';
+    document.getElementById('quiz-container').style.display = 'block';
+    displayQuestion();
+}
+
+function displayQuestion() {
+    const question = questions[currentQuestion];
+    const container = document.getElementById('question-container');
+    const progress = (currentQuestion / questions.length) * 100;
+    
+    document.querySelector('.progress-bar').style.width = `${progress}%`;
+    document.getElementById('question-counter').textContent = 
+        `Question ${currentQuestion + 1} of ${questions.length}`;
+
+    container.innerHTML = `
+        <h5 class="mb-4">${question.text}</h5>
+        <div class="options">
+            ${question.options.map((option, index) => `
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio" name="answer" 
+                           id="option${index}" value="${index}">
+                    <label class="form-check-label" for="option${index}">
+                        ${option}
+                    </label>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function submitAnswer() {
+    const selectedOption = document.querySelector('input[name="answer"]:checked');
+    if (!selectedOption) {
+        alert('Please select an answer');
+        return;
+    }
+
+    const answer = parseInt(selectedOption.value);
+    if (answer === questions[currentQuestion].correct) {
+        score++;
+    }
+
+    currentQuestion++;
+    
+    if (currentQuestion < questions.length) {
+        displayQuestion();
+    } else {
+        finishQuiz();
+    }
+}
+
+function finishQuiz() {
+    const finalScore = Math.round((score / questions.length) * 100);
+    
+    document.getElementById('quiz-container').style.display = 'none';
+    document.getElementById('results-container').style.display = 'block';
+    document.getElementById('final-score').textContent = `${finalScore}%`;
+    
+    let message;
+    if (finalScore >= 90) {
+        message = "Excellent! You have demonstrated exceptional knowledge.";
+    } else if (finalScore >= 70) {
+        message = "Good job! You have a solid understanding of the concepts.";
+    } else if (finalScore >= 50) {
+        message = "You've passed, but there's room for improvement.";
+    } else {
+        message = "You might want to review the concepts and try again.";
+    }
+    
+    document.getElementById('score-message').textContent = message;
+
+    // Submit score to server
+    fetch('/submit_quiz', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ score: finalScore })
+    });
+}
+
+function retakeQuiz() {
+    currentQuestion = 0;
+    score = 0;
+    document.getElementById('results-container').style.display = 'none';
+    document.getElementById('quiz-container').style.display = 'block';
+    displayQuestion();
+}
+</script>
+{% endblock %}

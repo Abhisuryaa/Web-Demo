@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="row align-items-center min-vh-75">
+    <div class="col-md-6">
+        <h1 class="display-4 mb-4">Welcome to TechVritti</h1>
+        <p class="lead mb-4">Your Career, Our Collaboration</p>
+        <p class="mb-4">Join our platform to showcase your skills, take assessment tests, and connect with opportunities that match your expertise.</p>
+        {% if not current_user.is_authenticated %}
+            <div class="d-grid gap-2 d-md-flex">
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg me-md-2">Get Started</a>
+                <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-lg">Login</a>
+            </div>
+        {% else %}
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Go to Dashboard</a>
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        <img src="{{ url_for('static', filename='img/hero.svg') }}" alt="Hero Image" class="img-fluid">
+    </div>
+</div>
+
+<div class="row mt-5 py-5 bg-light">
+    <div class="col-12 text-center mb-4">
+        <h2>How It Works</h2>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 bg-transparent">
+            <div class="card-body text-center">
+                <div class="display-4 mb-3">1</div>
+                <h5 class="card-title">Create Profile</h5>
+                <p class="card-text">Fill in your details, qualifications, and experience to create your professional profile.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 bg-transparent">
+            <div class="card-body text-center">
+                <div class="display-4 mb-3">2</div>
+                <h5 class="card-title">Take Assessment</h5>
+                <p class="card-text">Complete our skills evaluation quiz to showcase your technical knowledge.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 bg-transparent">
+            <div class="card-body text-center">
+                <div class="display-4 mb-3">3</div>
+                <h5 class="card-title">Track Progress</h5>
+                <p class="card-text">Monitor your performance and access your results through the dashboard.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
